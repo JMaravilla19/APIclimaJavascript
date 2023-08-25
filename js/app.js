@@ -63,6 +63,8 @@ function constularAPI(ciudad, pais){
     const appID = '1b73d020f4116e73f7542f102ee8cdaf';
     let url = `http://api.openweathermap.org/geo/1.0/direct?q=${ciudad},${pais}&limit=1&appid=${appID}`
     
+    spinner(); //muestra spinner de carga
+
     fetch(url)
         .then((respuesta)=>{
             return respuesta.json();
@@ -73,7 +75,8 @@ function constularAPI(ciudad, pais){
         } )
         .catch((error)=>{
             if (error) {
-                mostrarError('Error, Ciudad no encontrada');
+                 limpiarHTML();
+                mostrarError('Ciudad no encontrada');
                 formulario.reset();
             }
         })
@@ -88,6 +91,74 @@ function consultarSegundaAPI(lat, lon, appID){
             return resultado.json();
         })
         .then( (datos)=>{
-            console.log(datos);
+             limpiarHTML();
+            mostrarDatos(datos);
         } )
+        .catch( (error) =>{
+             mostrarError(`Error: ${error}`);
+        })
+}
+
+function mostrarDatos(datos){
+    //La temperatura se muestra en grados kelvin, para hacer la conversion:
+    // Celcius: temp - 273.15
+    const {name, main: { temp, temp_max, temp_min }} = datos;
+
+    const centigrados = kelvinACent(temp);
+    const max = kelvinACent(temp_max);
+    const min = kelvinACent(temp_min);
+    
+    // Temperatura Actual
+    const actual = document.createElement('P');
+    actual.innerHTML = `${centigrados}&#8451`;
+    actual.classList.add( 'font-bold', 'text-6xl' );
+
+    //Temperatura Maxima
+    const tempMaxima = document.createElement('P');
+    tempMaxima.innerHTML = `Temp Maxima: ${max}&#8451`;
+    tempMaxima.classList.add('text-xl');
+
+    //Temperatura Minima
+    const tempMinima = document.createElement('P');
+    tempMinima.innerHTML = `Temp Minima: ${min}&#8451`;
+    tempMinima.classList.add('text-xl');
+
+    // Nombre Ciudad
+    const nombreCiudad = document.createElement('P');
+    nombreCiudad.textContent = `Clima en: ${name}`;
+    nombreCiudad.classList.add('font-bold', 'text-2xl')
+
+    const resultadoDiv = document.createElement('DIV');
+    resultado.classList.add('text-center', 'text-white' )
+    resultadoDiv.appendChild(actual);
+    resultadoDiv.appendChild(tempMaxima);
+    resultadoDiv.appendChild(tempMinima);
+    resultadoDiv.appendChild(nombreCiudad);
+
+    resultado.appendChild(resultadoDiv);
+}
+
+function limpiarHTML(){
+    while(resultado.firstChild){
+        resultado.removeChild(resultado.firstChild)
+    }
+}
+
+const kelvinACent = grados => parseInt(grados - 273.15)
+
+function spinner(){
+    limpiarHTML();
+    const divSpinner = document.createElement('DIV');
+    divSpinner.classList.add('sk-chase')
+
+    divSpinner.innerHTML = `
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+            <div class="sk-chase-dot"></div>
+    `;
+
+    resultado.appendChild(divSpinner);
 }
