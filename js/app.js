@@ -61,7 +61,7 @@ function mostrarError(mensaje){
 
 function constularAPI(ciudad, pais){
     const appID = '1b73d020f4116e73f7542f102ee8cdaf';
-    let url = `http://api.openweathermap.org/geo/1.0/direct?q=${ciudad},${pais}&limit=1&appid=${appID}`
+    let url = `https://api.openweathermap.org/geo/1.0/direct?q=${ciudad},${pais}&limit=1&appid=${appID}`
     
     spinner(); //muestra spinner de carga
 
